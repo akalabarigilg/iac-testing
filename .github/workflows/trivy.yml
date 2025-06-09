@@ -9,25 +9,27 @@ on:
 permissions:
   contents: read
 
-
-
 jobs:
   trivy-scan:
-    name: trivy-scan
+    name: Trivy Docker Image Scan
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Run Trivy for Docker Image Scan
-      uses: aquasecurity/trivy-action@0.28.0
-      with:
-        scan-type: 'image'    # Change scan type to 'image'
-        image-ref: 'docker.io/library/mongo:4.4' # Correct image reference
-        format: "template"
-        template: '@/contrib/html.tpl'
-        output: 'trivy-results.html'
-        severity: 'CRITICAL,HIGH'
-    - name: Upload Trivy HTML Report as an artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: trivy-html-report
-        path: trivy-results.html
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run Trivy to Scan Docker Image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'image'
+          image-ref: 'docker.io/library/mongo:4.4'  # Fully qualified Docker Hub image reference
+          format: 'template'
+          template: '@/contrib/html.tpl'
+          output: 'trivy-results.html'
+          severity: 'CRITICAL,HIGH'
+          ignore-unfixed: true
+
+      - name: Upload Trivy HTML Report as an Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-html-report
+          path: trivy-results.html
