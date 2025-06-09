@@ -21,7 +21,7 @@ jobs:
       uses: aquasecurity/trivy-action@0.28.0
       with:
         scan-type: 'image'    # Change scan type to 'image'
-        image-ref: 'mongo:4.4' # Correct image reference
+        image-ref: 'docker.io/library/mongo:4.4' # Correct image reference
         format: "template"
         template: '@/contrib/html.tpl'
         output: 'trivy-results.html'
