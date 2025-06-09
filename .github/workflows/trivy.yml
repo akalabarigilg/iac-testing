@@ -20,8 +20,8 @@ jobs:
     - name: Run Trivy for Docker Image Scan
       uses: aquasecurity/trivy-action@0.28.0
       with:
-        image-ref: 'mongo:4.4' # Correct image reference
         scan-type: 'image'    # Change scan type to 'image'
+        image-ref: 'mongo:4.4' # Correct image reference
         format: "template"
         template: '@/contrib/html.tpl'
         output: 'trivy-results.html'
