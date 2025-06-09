@@ -19,4 +19,12 @@ jobs:
       uses: aquasecurity/trivy-action@0.28.0
       with:
         scan-type: 'config'
-        format: "table"
+        format: "template"
+        template: '@/contrib/html.tpl'
+        output: 'trivy-results.html'
+        severity: 'CRITICAL,HIGH'
+    - name: Upload Trivy HTML Report as an artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: trivy-html-report
+        path: trivy-results.html
