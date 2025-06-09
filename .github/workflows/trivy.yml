@@ -1,42 +1,27 @@
-name: trivy scan
-
+name: Semgrep
 on:
+  workflow_dispatch: {}
+  pull_request: {}
   push:
-    branches: ["master"]
-  pull_request:
-    branches: ["master"]
-
-permissions:
-  contents: read
-
+    branches:
+      - main
+      - master
+    paths:
+      - .github/workflows/semgrep.yml
+  #schedule:
+    # random HH:MM to avoid a load spike on GitHub Actions at 00:00
+    #- cron: '12 15 * * *'
 jobs:
-  trivy-scan:
+  semgrep:
+    name: semgrep/ci
+    runs-on: ubuntu-latest
     permissions:
       contents: read
-      security-events: write
-      actions: read
-    name: Build
-    runs-on: ubuntu-latest
+    env:
+      SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+    container:
+      image: semgrep/semgrep
+    if: (github.actor != 'dependabot[bot]')
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Build an image from Dockerfile
-        run: |
-          docker build -t docker.io/my-organization/my-app:${{ github.sha }} .
-
-      - name: Run Trivy vulnerability scanner (HTML)
-        uses: aquasecurity/trivy-action@7b7aa264d83dc58691451798b4d117d53d21edfe
-        with:
-          image-ref: 'mongo:4.4'
-          format: 'template'
-          template: '@/contrib/html.tpl'
-          output: 'trivy-results.html'
-          severity: 'CRITICAL,HIGH'
-      - name: Check if HTML report exists
-        run: ls -l trivy-results.html
-      - name: Upload Trivy HTML Report as an artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-html-report
-          path: trivy-results.html
+      - uses: actions/checkout@v4
+      - run: semgrep ci
