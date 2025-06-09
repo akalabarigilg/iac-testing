@@ -1,4 +1,4 @@
-name: trivy
+name: trivy scan
 
 on:
   push:
@@ -11,25 +11,31 @@ permissions:
 
 jobs:
   trivy-scan:
-    name: Trivy Docker Image Scan
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run Trivy to Scan Public Docker Image from Registry
-        uses: aquasecurity/trivy-action@0.28.0
+      - name: Build an image from Dockerfile
+        run: |
+          docker build -t docker.io/my-organization/my-app:${{ github.sha }} .
+
+      - name: Run Trivy vulnerability scanner (HTML)
+        uses: aquasecurity/trivy-action@7b7aa264d83dc58691451798b4d117d53d21edfe
         with:
-          scan-type: 'image'
-          image-ref: 'docker.io/library/mongo:4.4'
-          input-type: 'registry'  # ✅ THIS is what tells Trivy not to expect a local image
+          image-ref: 'mongo:4.4'
           format: 'template'
           template: '@/contrib/html.tpl'
           output: 'trivy-results.html'
           severity: 'CRITICAL,HIGH'
-          ignore-unfixed: true
-
-      - name: Upload Trivy HTML Report as an Artifact
+      - name: Check if HTML report exists
+        run: ls -l trivy-results.html
+      - name: Upload Trivy HTML Report as an artifact
         uses: actions/upload-artifact@v4
         with:
           name: trivy-html-report
