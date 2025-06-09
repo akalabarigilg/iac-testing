@@ -17,11 +17,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Run Trivy to Scan Docker Image
+      - name: Run Trivy to Scan Public Docker Image from Registry
         uses: aquasecurity/trivy-action@0.28.0
         with:
           scan-type: 'image'
-          image-ref: 'docker.io/library/mongo:4.4'  # Fully qualified Docker Hub image reference
+          image-ref: 'docker.io/library/mongo:4.4'
+          input-type: 'registry'  # ✅ THIS is what tells Trivy not to expect a local image
           format: 'template'
           template: '@/contrib/html.tpl'
           output: 'trivy-results.html'
