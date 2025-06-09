@@ -18,6 +18,7 @@ jobs:
     - name: Run Trivy for IaC
       uses: aquasecurity/trivy-action@0.28.0
       with:
+        image-ref: 'mongo:4.4'
         scan-type: 'config'
         format: "template"
         template: '@/contrib/html.tpl'
